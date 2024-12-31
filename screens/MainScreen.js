@@ -1,21 +1,41 @@
-import { SafeAreaView, StyleSheet, Text, View, Button, Platform } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Button, Platform, FlatList } from 'react-native';
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useSelector } from 'react-redux';
 import InputForm from '../components/InputForm';
 import TodoItem from '../components/TodoItem';
 
 const MainScreen = () => {
+    const todos = useSelector((state) => state.todo.todos);
+    const todoTasks = todos.filter((todo) => todo.state === 'todo');
+    const completedTasks = todos.filter((todo) => todo.state === 'done');
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar style="default" />
             <Text style = {styles.pageTitle} >ToDo App</Text>
             <View style = {styles.listView}>
                 <Text style = {styles.listTitle}>할 일</Text>
+                {todoTasks.length != 0 ? (
+                    <FlatList
+                        data={todoTasks}
+                        renderItem={({ item }) => <TodoItem {...item} />}
+                        keyExtractor={(item) => item.id}
+                    />) :
+                    (<Text style ={styles.emptyListText}>할 일이 없습니다.</Text>)    
+                }
             </View>
-            <TodoItem />
             <View style = {styles.separator} />
             <View style = {styles.listView}>
                 <Text style = {styles.listTitle}>완료된 일</Text>
+                {completedTasks.length != 0 ? (
+                    <FlatList
+                        data={completedTasks}
+                        renderItem={({ item }) => <TodoItem {...item} />}
+                        keyExtractor={(item) => item.id}
+                    />) :
+                    (<Text style ={styles.emptyListText}>완료된 일이 없습니다.</Text>)
+                }
             </View>
             <InputForm />
         </SafeAreaView>
@@ -51,5 +71,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         fontSize: 41,
         fontWeight: '500',
-    }
+    },
+    emptyListText: {
+        paddingTop: 10,
+        paddingBottom: 15,
+        paddingHorizontal: 15,
+        fontsize: 15,
+        lineHeight: 20,
+        color: '#737373',
+    },
 });
